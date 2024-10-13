@@ -12,10 +12,14 @@ You can also use **VIAL** to easily reflash and configure the keyboard without r
 5. Repeat 3,4 for the second keyboard part
 
 ### How to Enter Bootloader Mode:
+
 A) Connect the keyboard holding the top left or top right button (didn't work for me out of the box)
+
 B) Unscrew the lower plate and connect the RESET pins when connecting (https://i.imgur.com/mNZDhzU.png)
 
+
 After this custom firmware is flashed, bootloader mode can be entered by 
+
 C) holding the top middle button when connecting the keyboard
 
 ### Additional info about the process and restoring the keyboard
