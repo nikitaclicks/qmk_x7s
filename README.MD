@@ -6,10 +6,11 @@ You can also use **VIAL** to easily reflash and configure the keyboard without r
 
 ### How to Use and flash:
 1. pull qmk or vial-qmk
-2. `qmk compile -kb x7s -km miryoku`
-3. Connect the keyboard in bootloader mode, see below
-4. `qmk flash x7s_miryoku.bin`
-5. Repeat 3,4 for the second keyboard part
+2. clone the repo into `keyboards` folder
+3. `qmk compile -kb x7s -km miryoku`
+4. Connect the keyboard in bootloader mode, see below
+5. `qmk flash x7s_miryoku.bin`
+6. Repeat 3,4 for the second keyboard part
 
 ### How to Enter Bootloader Mode:
 
