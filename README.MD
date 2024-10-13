@@ -1,7 +1,5 @@
 # X.Tips X7S / IQX7S / XTips X7 Mechanical Keyboard with QMK and VIAL Support, colemak-dh and miryoku
 
-[https://github.com/manna-harbour/miryoku/blob/master/data/cover/miryoku-kle-cover.png]
-
 The keyboard works out of the box with **VIA** using the `via-x7.json` file. The QMK files in this repository were provided by the vendor, and you can use them to customize the keyboard via **QMK**.
 
 You can also use **VIAL** to easily reflash and configure the keyboard without recompiling the firmware, while taking advantage of features like tap dance, chords, auto-shift, and other QMK functionalities.
