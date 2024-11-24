@@ -4,6 +4,41 @@
 #endif
 #include "leds.c"
 
+enum custom_keycodes {
+  LANG_ENG = SAFE_RANGE, // Ensure these don't conflict with existing keycodes
+  LANG_RUS,
+  LT_SYM_ENT,
+  LT_NUM_BSPC,
+};
+
+const uint16_t PROGMEM switch_to_rus[]    = {KC_D,    KC_H,    COMBO_END};
+const uint16_t PROGMEM switch_to_eng[]    = {KC_V,    KC_M,    COMBO_END};
+
+// combo_t key_combos[] = {
+//   COMBO(switch_to_rus,    LANG_RUS),
+// };
+
+typedef struct
+{
+    bool     is_active;
+    bool     command_sent;
+    uint16_t timer;
+} layer_tap_t;
+
+layer_tap_t my_lt = {false, false, 0};
+
+bool need_to_restore_layer = false;
+
+enum LAYERS {
+    _BASE,
+    _NAV,
+    _MOUSE,
+    _MEDIA,
+    _NUM,
+    _SYM,
+    _FUN,
+    _QWERTY,
+};
 
 /* THIS FILE WAS GENERATED!
  *
@@ -11,17 +46,12 @@
  * edit it directly.
  */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    // base
-    [0] = LAYOUT(
+    [_BASE] = LAYOUT(
 			KC_Q,    KC_W,      KC_F,              KC_P,              KC_B,              KC_J,              KC_L,              KC_U,              KC_Y,              KC_QUOT,           \
 LGUI_T(KC_A),      LALT_T(KC_R),      LCTL_T(KC_S),      LSFT_T(KC_T),      KC_G,              KC_M,              LSFT_T(KC_N),      LCTL_T(KC_E),      LALT_T(KC_I),      LGUI_T(KC_O),      \
 KC_Z, ALGR_T(KC_X),      KC_C,              KC_D,              KC_V,              KC_K,              KC_H,              KC_COMM,           ALGR_T(KC_DOT),    KC_SLSH,\
             XXXXXXX,XXXXXXX,                        LT(3,KC_ESC), LT(1,KC_SPC), LT(2,KC_TAB),  /*||*/  LT(5,KC_ENT), LT(4,KC_BSPC), LT(6,KC_DEL), XXXXXXX, XXXXXXX
-        // KC_Q,         KC_W,         KC_E,         KC_R,         KC_T,          /*||*/  KC_Y,         KC_U,          KC_I,         KC_O,           KC_P,
-        // LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D), LSFT_T(KC_F), KC_G,          /*||*/  KC_H,         LSFT_T(KC_J),  LCTL_T(KC_K), LALT_T(KC_L),   LGUI_T(KC_SCLN),
-        // KC_Z,         RALT_T(KC_X), KC_C,         KC_V,         KC_B,          /*||*/  KC_N,         KC_M,          KC_COMM,      RALT_T(KC_DOT), KC_SLSH,
-        //     XXXXXXX,XXXXXXX,                        LT(3,KC_ESC), LT(1,KC_SPC), LT(2,KC_TAB),  /*||*/  LT(5,KC_ENT), LT(4,KC_BSPC), LT(6,KC_DEL), XXXXXXX, XXXXXXX
-    ),
+),
 
     // nav - vi
     // [1] = LAYOUT(
@@ -31,9 +61,8 @@ KC_Z, ALGR_T(KC_X),      KC_C,              KC_D,              KC_V,            
     //     XXXXXXX,XXXXXXX,KC_NO,   KC_NO,   KC_NO,   KC_ENT,  KC_BSPC, KC_DEL,XXXXXXX,XXXXXXX
     // ),
 
-
     // nav
-    [1] = LAYOUT(
+    [_NAV] = LAYOUT(
         RESET,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_AGIN, KC_UNDO, KC_CUT,  KC_COPY, KC_PSTE,
         KC_LGUI, KC_LALT, KC_LCTL, KC_LSFT, KC_NO,   KC_CAPS, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT,
         KC_NO,   KC_RALT, KC_NO,   KC_NO,   KC_NO,   KC_INS,  KC_HOME, KC_PGDN, KC_PGUP, KC_END,
@@ -41,7 +70,7 @@ KC_Z, ALGR_T(KC_X),      KC_C,              KC_D,              KC_V,            
     ),
 
     // mouse
-    [2] = LAYOUT(
+    [_MOUSE] = LAYOUT(
         RESET,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO, KC_NO,   KC_NO,   KC_NO,   KC_NO,
         KC_LGUI, KC_LALT, KC_LCTL, KC_LSFT, KC_NO,   KC_NO, KC_MS_L, KC_MS_D, KC_MS_U, KC_MS_R,
         KC_NO,   KC_RALT, KC_NO,   KC_NO,   KC_NO,   KC_NO, KC_WH_L, KC_WH_D, KC_WH_U, KC_WH_R,
@@ -49,15 +78,15 @@ KC_Z, ALGR_T(KC_X),      KC_C,              KC_D,              KC_V,            
     ),
 
     // media
-    [3] = LAYOUT(
+    [_MEDIA] = LAYOUT(
         RESET,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   RGB_TOG, RGB_MOD, RGB_HUI, RGB_SAI, RGB_VAI,
         KC_LGUI, KC_LALT, KC_LCTL, KC_LSFT, KC_NO,   KC_NO,   KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT,
-        KC_NO,   KC_RALT, KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
+        KC_NO,   KC_RALT, KC_NO,   KC_NO,   KC_NO,   LANG_RUS,   LANG_ENG,   KC_NO,   KC_NO,   KC_NO,
         XXXXXXX,XXXXXXX,KC_NO,   KC_NO,   KC_NO,   KC_MSTP, KC_MPLY, KC_MUTE,XXXXXXX,XXXXXXX
     ),
 
     // num
-    [4] = LAYOUT(
+    [_NUM] = LAYOUT(
         KC_LBRC, KC_7, KC_8,    KC_9,  KC_RBRC, KC_NO, KC_NO,   KC_NO,   KC_NO,   RESET,
         KC_SCLN, KC_4, KC_5,    KC_6,  KC_EQL,  KC_NO, KC_LSFT, KC_LCTL, KC_LALT, KC_LGUI,
         KC_GRV,  KC_1, KC_2,    KC_3,  KC_BSLS, KC_NO, KC_NO,   KC_NO,   KC_RALT, KC_NO,
@@ -65,7 +94,7 @@ KC_Z, ALGR_T(KC_X),      KC_C,              KC_D,              KC_V,            
     ),
 
     // sym
-    [5] = LAYOUT(
+    [_SYM] = LAYOUT(
         KC_LCBR, KC_AMPR, KC_ASTR, KC_LPRN, KC_RCBR, KC_NO, KC_NO,   KC_NO,   KC_NO,   RESET,
         KC_COLN, KC_DLR,  KC_PERC, KC_CIRC, KC_PLUS, KC_NO, KC_LSFT, KC_LCTL, KC_LALT, KC_LGUI,
         KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_PIPE, KC_NO, KC_NO,   KC_NO,   KC_RALT, KC_NO,
@@ -73,13 +102,19 @@ KC_Z, ALGR_T(KC_X),      KC_C,              KC_D,              KC_V,            
     ),
 
     // fun
-    [6] = LAYOUT(
+    [_FUN] = LAYOUT(
         KC_F12, KC_F7,  KC_F8,  KC_F9, KC_PSCR, KC_NO, KC_NO,   KC_NO,   KC_NO,   RESET,
         KC_F11, KC_F4,  KC_F5,  KC_F6, KC_SCRL, KC_NO, KC_LSFT, KC_LCTL, KC_LALT, KC_LGUI,
         KC_F10, KC_F1,  KC_F2,  KC_F3, KC_PAUS, KC_NO, KC_NO,   KC_NO,   KC_RALT, KC_NO,
        XXXXXXX,XXXXXXX, KC_APP, KC_SPC, KC_TAB, KC_NO, KC_NO,   KC_NO,XXXXXXX,XXXXXXX
-    )
+    ),
 
+    [_QWERTY] = LAYOUT(
+        KC_Q,         KC_W,         KC_E,         KC_R,         KC_T,          /*||*/  KC_Y,         KC_U,          KC_I,         KC_O,           KC_P,
+        LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D), LSFT_T(KC_F), KC_G,          /*||*/  KC_H,         LSFT_T(KC_J),  LCTL_T(KC_K), LALT_T(KC_L),   LGUI_T(KC_SCLN),
+        KC_Z,         RALT_T(KC_X), KC_C,         KC_V,         KC_B,          /*||*/  KC_N,         KC_M,          KC_COMM,      RALT_T(KC_DOT), KC_SLSH,
+            XXXXXXX,XXXXXXX,                        LT(_MEDIA,KC_ESC), LT(1,KC_SPC), LT(_MOUSE,KC_TAB),  /*||*/   LT_SYM_ENT, LT_NUM_BSPC, LT(6,KC_DEL), XXXXXXX, XXXXXXX
+    ),
 };
 
 #if defined(ENCODER_ENABLE) && defined(ENCODER_MAP_ENABLE)
@@ -88,6 +123,182 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
 };
 #endif // defined(ENCODER_ENABLE) && defined(ENCODER_MAP_ENABLE)
 
+//////////////// here we switch languages
+//
+// define fallback first
+void switch_to_english(void)
+{
+    // Save mods.
+    uint8_t mod_state = get_mods();
+    // Clear mods so Windows doesn't get confused.
+    clear_mods();
+    // Ctrl+Alt+0 sent to host
+    SEND_STRING(SS_LSFT(SS_LALT("0")));
+    // Switch to default layer.
+    layer_move(_BASE);
+    // debug
+    dprint("Switched to English!\n");
+    // Restore mods.
+    set_mods(mod_state);
+};
 
+#define RUS_LAYER_TIMEOUT 5000  // timeout in milliseconds
 
+void switch_to_russian(void)
+{
+    // switch back to English if already in Russian mode
+    if (_QWERTY == get_highest_layer(layer_state))
+    {
+        dprint("Russian active! Switching back to English\n");
+        switch_to_english();
+    }
+    else
+    {
+        // Save mods.
+        uint8_t mod_state = get_mods();
+        // Clear mods so Windows doesn't get confused.
+        clear_mods();
+        // Ctrl+Alt+1 sent to host
+        SEND_STRING(SS_LSFT(SS_LALT("1")));
+        // Switch to Cyrillic-friendly layer.
+        layer_move(_QWERTY);
+        // debug
+        dprint("Switched to Russian!\n");
+        // Restore mods.
+        set_mods(mod_state);
+    };
+};
 
+void matrix_scan_user(void)
+{
+    // achordion
+    // achordion_task();
+    //
+    // this resets current language to English after <timeout> if Russian was active
+    if (_QWERTY == get_highest_layer(layer_state))
+    {
+        if (RUS_LAYER_TIMEOUT < last_input_activity_elapsed())
+        {
+            switch_to_english();
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////
+// This switches to English but only when LT-key is pressed and another key it tapped.
+//
+// Function to handle layer-tap logic
+void process_layer_tap(uint16_t keycode, uint16_t layer, keyrecord_t *record)
+{
+    if (record->event.pressed)
+    {
+        // Key was pressed - start timer.
+        my_lt.timer = timer_read();
+        my_lt.is_active = true;
+        layer_on(layer);
+        dprintf("lt: pressed!\n");
+    } else { // Key was released
+             // Was it a tap?
+        if (my_lt.is_active && (TAPPING_TERM > timer_elapsed(my_lt.timer)))
+        {
+            tap_code(keycode);
+            dprintf("lt: tapped!\n");
+        }
+        layer_off(layer);
+        // Only retore win kbd layout if it was switched.
+        // if (my_lt.command_sent)
+        // {
+            // Tell Windows we're still in Cyrillic
+            SEND_STRING(SS_LSFT(SS_LALT("1")));
+            // Clear flag.
+            my_lt.command_sent = false;
+            dprintf("lt: sent SA(1) to windows!\n");
+        // }
+        my_lt.is_active = false;
+        dprintf("lt: released!\n");
+    }
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+     uint8_t mod_state = get_mods();
+
+    // Check if the current layer is U_EXTRA
+    // and key is pressed
+    // and HRMs are active
+    if (layer_state_cmp(layer_state, _QWERTY) &&
+            record->event.pressed &&
+            (mod_state & (MOD_BIT(KC_LALT) |
+                          MOD_BIT(KC_LCTL) |
+                          MOD_BIT(KC_LGUI))))
+    {
+        {
+            dprintf("HRMs active, switching to U_BASE\n");
+            layer_move(_BASE);
+            need_to_restore_layer = true;
+            return true; // Continue normal tab processing
+        }
+    }
+
+    if (!record->event.pressed &&
+            need_to_restore_layer)
+    {
+        dprintf("Restoring U_EXTRA\n");
+        layer_move(_QWERTY);
+        need_to_restore_layer = false;
+        return true; // Continue normal tab processing
+    }
+
+  // check for specific keycodes
+  switch (keycode) {
+   // user keys first
+        case LANG_ENG:
+            if (record->event.pressed)
+                switch_to_english();
+            return false; // Skip further processing
+
+        case LANG_RUS:
+            if (record->event.pressed)
+                switch_to_russian();
+            return false; // Skip further processing
+    case LT_SYM_ENT:
+      process_layer_tap(KC_ENT, _SYM, record);
+      return false; // Skip all further processing of this key
+      //
+    case LT_NUM_BSPC:
+      process_layer_tap(KC_BSPC, _NUM, record);
+      return false; // Skip all further processing of this key
+    // special consideration for TAB & ESCAPE & digits
+        case LT(_MOUSE,KC_TAB):
+        case LT(_MEDIA,KC_ESC):
+            // only operate if pressed
+            if (record->event.pressed &&
+                    // Ignore if held
+                    record->tap.count     &&
+                    // Check if the current layer is U_EXTRA
+                    layer_state_cmp(layer_state, _QWERTY) &&
+                    // And any of the modifiers are active
+                    (mod_state & (MOD_BIT(KC_LALT) |
+                                  MOD_BIT(KC_LSFT) |
+                                  MOD_BIT(KC_LCTL) |
+                                  MOD_BIT(KC_LGUI)
+                                 )))
+            {
+                switch_to_english();
+            };
+            return true; // Continue normal tab processing
+    default:
+      if (my_lt.is_active && record->event.pressed) {
+        // Only switch win kbd layout if it has not been switched.
+        // if (!my_lt.command_sent) {
+          // Custom function called when any key is pressed while MY_LT is active
+          my_lt.command_sent = true;
+          SEND_STRING(SS_LSFT(SS_LALT("0")));
+          dprintf("lt: sent SA(0) to windows!\n");
+        // }
+        return true;  // Allow the key press to be handled normally by QMK
+      }
+      break;
+  } // done with specific keys
+  //
+  return true;
+}
