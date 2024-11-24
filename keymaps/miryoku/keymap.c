@@ -11,13 +11,6 @@ enum custom_keycodes {
   LT_NUM_BSPC,
 };
 
-const uint16_t PROGMEM switch_to_rus[]    = {KC_D,    KC_H,    COMBO_END};
-const uint16_t PROGMEM switch_to_eng[]    = {KC_V,    KC_M,    COMBO_END};
-
-// combo_t key_combos[] = {
-//   COMBO(switch_to_rus,    LANG_RUS),
-// };
-
 typedef struct
 {
     bool     is_active;
@@ -37,7 +30,7 @@ enum LAYERS {
     _NUM,
     _SYM,
     _FUN,
-    _QWERTY,
+    _RULEMAK,
 };
 
 /* THIS FILE WAS GENERATED!
@@ -109,7 +102,7 @@ KC_Z, ALGR_T(KC_X),      KC_C,              KC_D,              KC_V,            
        XXXXXXX,XXXXXXX, KC_APP, KC_SPC, KC_TAB, KC_NO, KC_NO,   KC_NO,XXXXXXX,XXXXXXX
     ),
 
-    [_QWERTY] = LAYOUT(
+    [_RULEMAK] = LAYOUT(
         KC_Q,         KC_W,         KC_E,         KC_R,         KC_T,          /*||*/  KC_Y,         KC_U,          KC_I,         KC_O,           KC_P,
         LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D), LSFT_T(KC_F), KC_G,          /*||*/  KC_H,         LSFT_T(KC_J),  LCTL_T(KC_K), LALT_T(KC_L),   LGUI_T(KC_SCLN),
         KC_Z,         RALT_T(KC_X), KC_C,         KC_V,         KC_B,          /*||*/  KC_N,         KC_M,          KC_COMM,      RALT_T(KC_DOT), KC_SLSH,
@@ -117,23 +110,15 @@ KC_Z, ALGR_T(KC_X),      KC_C,              KC_D,              KC_V,            
     ),
 };
 
-#if defined(ENCODER_ENABLE) && defined(ENCODER_MAP_ENABLE)
-const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
 
-};
-#endif // defined(ENCODER_ENABLE) && defined(ENCODER_MAP_ENABLE)
-
-//////////////// here we switch languages
-//
-// define fallback first
 void switch_to_english(void)
 {
     // Save mods.
     uint8_t mod_state = get_mods();
     // Clear mods so Windows doesn't get confused.
     clear_mods();
-    // Ctrl+Alt+0 sent to host
-    SEND_STRING(SS_LSFT(SS_LALT("0")));
+    // Shift+Ctrl+0 sent to host
+    SEND_STRING(SS_LSFT(SS_LCTL("0")));
     // Switch to default layer.
     layer_move(_BASE);
     // debug
@@ -147,9 +132,8 @@ void switch_to_english(void)
 void switch_to_russian(void)
 {
     // switch back to English if already in Russian mode
-    if (_QWERTY == get_highest_layer(layer_state))
+    if (_RULEMAK == get_highest_layer(layer_state))
     {
-        dprint("Russian active! Switching back to English\n");
         switch_to_english();
     }
     else
@@ -158,12 +142,10 @@ void switch_to_russian(void)
         uint8_t mod_state = get_mods();
         // Clear mods so Windows doesn't get confused.
         clear_mods();
-        // Ctrl+Alt+1 sent to host
-        SEND_STRING(SS_LSFT(SS_LALT("1")));
+        // Shift+Ctrl+1 sent to host
+        SEND_STRING(SS_LSFT(SS_LCTL("1")));
         // Switch to Cyrillic-friendly layer.
-        layer_move(_QWERTY);
-        // debug
-        dprint("Switched to Russian!\n");
+        layer_move(_RULEMAK);
         // Restore mods.
         set_mods(mod_state);
     };
@@ -171,11 +153,8 @@ void switch_to_russian(void)
 
 void matrix_scan_user(void)
 {
-    // achordion
-    // achordion_task();
-    //
     // this resets current language to English after <timeout> if Russian was active
-    if (_QWERTY == get_highest_layer(layer_state))
+    if (_RULEMAK == get_highest_layer(layer_state))
     {
         if (RUS_LAYER_TIMEOUT < last_input_activity_elapsed())
         {
@@ -206,26 +185,26 @@ void process_layer_tap(uint16_t keycode, uint16_t layer, keyrecord_t *record)
         }
         layer_off(layer);
         // Only retore win kbd layout if it was switched.
-        // if (my_lt.command_sent)
-        // {
+        if (my_lt.command_sent)
+        {
             // Tell Windows we're still in Cyrillic
-            SEND_STRING(SS_LSFT(SS_LALT("1")));
+            SEND_STRING(SS_LSFT(SS_LCTL("1")));
             // Clear flag.
             my_lt.command_sent = false;
             dprintf("lt: sent SA(1) to windows!\n");
-        // }
+        }
         my_lt.is_active = false;
         dprintf("lt: released!\n");
     }
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-     uint8_t mod_state = get_mods();
+    uint8_t mod_state = get_mods();
 
     // Check if the current layer is U_EXTRA
     // and key is pressed
     // and HRMs are active
-    if (layer_state_cmp(layer_state, _QWERTY) &&
+    if (layer_state_cmp(layer_state, _RULEMAK) &&
             record->event.pressed &&
             (mod_state & (MOD_BIT(KC_LALT) |
                           MOD_BIT(KC_LCTL) |
@@ -243,7 +222,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             need_to_restore_layer)
     {
         dprintf("Restoring U_EXTRA\n");
-        layer_move(_QWERTY);
+        layer_move(_RULEMAK);
         need_to_restore_layer = false;
         return true; // Continue normal tab processing
     }
@@ -275,7 +254,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     // Ignore if held
                     record->tap.count     &&
                     // Check if the current layer is U_EXTRA
-                    layer_state_cmp(layer_state, _QWERTY) &&
+                    layer_state_cmp(layer_state, _RULEMAK) &&
                     // And any of the modifiers are active
                     (mod_state & (MOD_BIT(KC_LALT) |
                                   MOD_BIT(KC_LSFT) |
@@ -289,12 +268,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     default:
       if (my_lt.is_active && record->event.pressed) {
         // Only switch win kbd layout if it has not been switched.
-        // if (!my_lt.command_sent) {
+        if (!my_lt.command_sent) {
           // Custom function called when any key is pressed while MY_LT is active
           my_lt.command_sent = true;
-          SEND_STRING(SS_LSFT(SS_LALT("0")));
+          SEND_STRING(SS_LSFT(SS_LCTL("0")));
           dprintf("lt: sent SA(0) to windows!\n");
-        // }
+        }
         return true;  // Allow the key press to be handled normally by QMK
       }
       break;
