@@ -1,4 +1,6 @@
-# X.Tips X7S / IQX7S / XTips X7 Mechanical Keyboard with QMK and VIAL Support, colemak-dh and miryoku
+# X.Tips X7S / IQX7S / XTips X7 Mechanical Keyboard
+## With QMK and VIAL Support
+### Miryoku, colemak-dh base layer
 
 The keyboard works out of the box with **VIA** using the `via-x7.json` file. The QMK files in this repository were provided by the vendor, and you can use them to customize the keyboard via **QMK**.
 
