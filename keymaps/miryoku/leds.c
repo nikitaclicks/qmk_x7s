@@ -1,27 +1,4 @@
 
-// const rgblight_segment_t PROGMEM layer0_colors[] = RGBLIGHT_LAYER_SEGMENTS(
-//     {0, 2, 85, 255, 75}
-// );
-// const rgblight_segment_t PROGMEM layer1_colors[] = RGBLIGHT_LAYER_SEGMENTS(
-//     {0, 2, 170, 255, 75}
-// );
-// const rgblight_segment_t PROGMEM layer2_colors[] = RGBLIGHT_LAYER_SEGMENTS(
-//     {0, 2, 55, 255, 75}
-// );
-// const rgblight_segment_t PROGMEM layer3_colors[] = RGBLIGHT_LAYER_SEGMENTS(
-//     {0, 2, 191, 255, 75}
-// );
-// const rgblight_segment_t PROGMEM layer4_colors[] = RGBLIGHT_LAYER_SEGMENTS(
-//     {0, 2, 30, 218, 75}
-// );
-// const rgblight_segment_t PROGMEM layer5_colors[] = RGBLIGHT_LAYER_SEGMENTS(
-//     {0, 2, 11, 176, 75}
-// );
-// const rgblight_segment_t PROGMEM layer6_colors[] = RGBLIGHT_LAYER_SEGMENTS(
-//     {0, 2, 106, 255, 75}
-// );
-
-
 /*Remember to also change the color in keyboard_post_init_kb in boston.c to make the startup color match the layer 0 color */
 const rgblight_segment_t PROGMEM capslock_layer[] = RGBLIGHT_LAYER_SEGMENTS(
     {0, 2, HSV_WHITE} 

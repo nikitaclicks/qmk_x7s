@@ -4,21 +4,6 @@
 #endif
 #include "leds.c"
 
-enum custom_keycodes {
-    LANG_LAYER_BASE = SAFE_RANGE, // Ensure these don't conflict with existing keycodes
-    LANG_LAYER_QWERTY,
-};
-
-typedef struct {
-    bool     is_active;
-    bool     command_sent;
-    uint16_t timer;
-} layer_tap_t;
-
-layer_tap_t my_lt = {false, false, 0};
-
-bool need_to_restore_layer = false;
-
 enum LAYERS {
     _BASE,
     _QWERTY,
@@ -29,7 +14,6 @@ enum LAYERS {
     _NUM,
     _SYM,
     _FUN,
-    //_RULEMAK,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -83,7 +67,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     // symbols layer (num + shift)
     [_SYM] = LAYOUT(
-        KC_LCBR, KC_AMPR, KC_ASTR, KC_LPRN, KC_RCBR,    LANG_LAYER_QWERTY, LANG_LAYER_BASE, DF(_GAME), DF(_QWERTY), DF(_BASE),
+        KC_LCBR, KC_AMPR, KC_ASTR, KC_LPRN, KC_RCBR,    KC_NO, KC_NO, DF(_GAME), DF(_QWERTY), DF(_BASE),
         KC_COLN, KC_DLR, KC_PERC, KC_CIRC, KC_PLUS,     KC_NO, KC_LSFT, KC_LCTL, KC_LALT, KC_LGUI,
         KC_TILD, KC_EXLM, KC_AT, KC_HASH, KC_PIPE,      KC_NO, KC_NO, KC_NO, KC_RALT, KC_NO, 
         XXXXXXX, XXXXXXX, KC_LPRN, KC_RPRN, KC_UNDS,    KC_NO, KC_NO, KC_NO, XXXXXXX, XXXXXXX
@@ -97,81 +81,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         XXXXXXX, XXXXXXX, KC_APP, KC_SPC, KC_TAB,       KC_NO, KC_NO, KC_NO, XXXXXXX, XXXXXXX
     ),
 
-    // // phonetic Russian layer
-    // [_RULEMAK] = LAYOUT(
-    //     RU_YU, RU_SHA, RU_EF, RU_PE, RU_BE,                                         /* || */ RU_YA, RU_EL, RU_U, RU_SHTI, RU_SOFT, 
-    //     LGUI_T(RU_A), LALT_T(RU_ER), LCTL_T(RU_ES), LSFT_T(RU_TE), RU_GHE,          /* || */ RU_EM, LSFT_T(RU_EN), LCTL_T(RU_IE), LALT_T(RU_I), LGUI_T(RU_O), 
-    //     RU_ZE, ALGR_T(RU_SHCH), RU_TSE, RU_DE, RU_VE,                               /* || */ RU_KA, RU_HA, RU_CHE, ALGR_T(RU_ZHE), RU_HARD, 
-    //     XXXXXXX, XXXXXXX, LT(_MEDIA, KC_ESC), LT(1, KC_SPC), LT(_MOUSE, KC_TAB),    /* || */ LT_SYM_ENT, LT(4, KC_BSPC), LT(6, KC_DEL), XXXXXXX, XXXXXXX
-    // ),
-
     // gaming layer
     [_GAME] = LAYOUT(
-        KC_1, KC_Q, KC_W, KC_E, KC_R,                   /* || */ LANG_LAYER_QWERTY, LANG_LAYER_BASE, KC_NO, DF(_QWERTY), DF(_BASE),
-        KC_2, KC_A, KC_S, KC_D, KC_F,                   /* || */ XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, 
-        KC_3, KC_Z, KC_X, KC_C, KC_V,                   /* || */ XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, 
-        XXXXXXX, XXXXXXX, KC_LCTL, KC_LSFT, KC_SPC,     /* || */ KC_TAB, KC_LALT, KC_ESC, XXXXXXX, XXXXXXX
+        KC_1, KC_2, KC_W, KC_E, KC_R,                   /* || */ KC_NO, KC_NO, KC_NO, DF(_QWERTY), DF(_BASE),
+        KC_Q, KC_A, KC_S, KC_D, KC_F,                   /* || */ KC_G, KC_LEFT, KC_DOWN, KC_UP, KC_RGHT,
+        KC_TAB, KC_Z, KC_X, KC_G, KC_B,                   /* || */ KC_1, KC_2, KC_3, KC_VOLD, KC_VOLU, 
+        XXXXXXX, XXXXXXX, KC_LSFT, KC_LCTL, KC_SPC,     /* || */ KC_TAB, KC_LALT, KC_ESC, XXXXXXX, XXXXXXX
     ),
 };
-
-#define LANG_LAYER_TIMEOUT 5000 // timeout in milliseconds
-
-void switch_language_layout(uint16_t layer) {
-    uint8_t mod_state = get_mods();
-    clear_mods();
-    SEND_STRING(SS_LGUI(" "));
-    layer_move(layer);
-    set_mods(mod_state);
-};
-
-void matrix_scan_user(void) {
-    // this resets current language to _BASE after <timeout> if _QWERTY was active
-    if (_QWERTY == get_highest_layer(layer_state)) {
-        if (LANG_LAYER_TIMEOUT < last_input_activity_elapsed()) {
-            switch_language_layout(_BASE);
-        }
-    }
-}
-
-void process_layer_tap(uint16_t keycode, uint16_t layer, keyrecord_t *record) {
-    if (record->event.pressed) {
-        // Key was pressed - start timer.
-        my_lt.timer     = timer_read();
-        my_lt.is_active = true;
-        layer_on(layer);
-    } else { // Key was released
-             // Was it a tap?
-        if (my_lt.is_active && (TAPPING_TERM > timer_elapsed(my_lt.timer))) {
-            tap_code(keycode);
-        }
-        layer_off(layer);
-
-        if (my_lt.command_sent) {
-            SEND_STRING(SS_LGUI(" "));
-            my_lt.command_sent = false;
-        }
-        my_lt.is_active = false;
-    }
-}
-
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case LANG_LAYER_BASE:
-            if (record->event.pressed) {
-                switch_language_layout(_BASE);
-            }
-            return false;
-
-        case LANG_LAYER_QWERTY:
-            if (record->event.pressed) {
-                uint16_t layer = _QWERTY == get_highest_layer(layer_state) ? _BASE : _QWERTY;
-                switch_language_layout(layer);
-            }
-            return false;
-        default:
-            break;
-    }
-   
-   
-    return true;
-}

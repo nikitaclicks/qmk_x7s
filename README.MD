@@ -10,7 +10,8 @@ You can also use **VIAL** to easily reflash and configure the keyboard without r
 3. `qmk compile -kb x7s -km miryoku`
 4. Connect the keyboard in bootloader mode, see below
 5. `qmk flash x7s_miryoku.bin`
-6. Repeat 3,4 for the second keyboard part
+6. Go to https://vial.rocks/ -> QMK Settings -> Tap Hold -> Enable Permissive Hold, Ignore Mod Tap interrupt
+7. Repeat 3,4,6 for the second keyboard part
 
 ### How to Enter Bootloader Mode:
 
