@@ -72,7 +72,7 @@ void keyboard_post_init_user(void) {
 
 layer_state_t layer_state_set_user(layer_state_t state) {
     // Both layers will light up if both kb layers are active
-    // rgblight_set_layer_state(0, layer_state_cmp(state, 0));
+    rgblight_set_layer_state(0, layer_state_cmp(state, 0));
     rgblight_set_layer_state(1, layer_state_cmp(state, 1));
     rgblight_set_layer_state(2, layer_state_cmp(state, 2));
     rgblight_set_layer_state(3, layer_state_cmp(state, 3));
