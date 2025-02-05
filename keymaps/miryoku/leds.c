@@ -1,27 +1,4 @@
 
-// const rgblight_segment_t PROGMEM layer0_colors[] = RGBLIGHT_LAYER_SEGMENTS(
-//     {0, 2, 85, 255, 75}
-// );
-// const rgblight_segment_t PROGMEM layer1_colors[] = RGBLIGHT_LAYER_SEGMENTS(
-//     {0, 2, 170, 255, 75}
-// );
-// const rgblight_segment_t PROGMEM layer2_colors[] = RGBLIGHT_LAYER_SEGMENTS(
-//     {0, 2, 55, 255, 75}
-// );
-// const rgblight_segment_t PROGMEM layer3_colors[] = RGBLIGHT_LAYER_SEGMENTS(
-//     {0, 2, 191, 255, 75}
-// );
-// const rgblight_segment_t PROGMEM layer4_colors[] = RGBLIGHT_LAYER_SEGMENTS(
-//     {0, 2, 30, 218, 75}
-// );
-// const rgblight_segment_t PROGMEM layer5_colors[] = RGBLIGHT_LAYER_SEGMENTS(
-//     {0, 2, 11, 176, 75}
-// );
-// const rgblight_segment_t PROGMEM layer6_colors[] = RGBLIGHT_LAYER_SEGMENTS(
-//     {0, 2, 106, 255, 75}
-// );
-
-
 /*Remember to also change the color in keyboard_post_init_kb in boston.c to make the startup color match the layer 0 color */
 const rgblight_segment_t PROGMEM capslock_layer[] = RGBLIGHT_LAYER_SEGMENTS(
     {0, 2, HSV_WHITE} 
@@ -29,78 +6,63 @@ const rgblight_segment_t PROGMEM capslock_layer[] = RGBLIGHT_LAYER_SEGMENTS(
 
 );
 
-const rgblight_segment_t PROGMEM layer_1[] = RGBLIGHT_LAYER_SEGMENTS(
+const rgblight_segment_t PROGMEM layer_nav[] = RGBLIGHT_LAYER_SEGMENTS(
             {0, 2, HSV_TEAL} 
             // {0, 2, 180, 87, 75 }
             
 
 );
 
-const rgblight_segment_t PROGMEM layer_2[] = RGBLIGHT_LAYER_SEGMENTS(
+const rgblight_segment_t PROGMEM layer_mouse[] = RGBLIGHT_LAYER_SEGMENTS(
              {0, 2, HSV_YELLOW} /*Yellow*/
                         // {0, 2, 60, 87, 75 }
 
    
 );
 
-const rgblight_segment_t PROGMEM layer_3[] = RGBLIGHT_LAYER_SEGMENTS(
+const rgblight_segment_t PROGMEM layer_media[] = RGBLIGHT_LAYER_SEGMENTS(
      {0, 2, HSV_MAGENTA} /*Yellow*/
                         // {0, 2, 300, 89, 75 }
 
 );
 
-const rgblight_segment_t PROGMEM layer_4[] = RGBLIGHT_LAYER_SEGMENTS(
+const rgblight_segment_t PROGMEM layer_num[] = RGBLIGHT_LAYER_SEGMENTS(
             {0, 2, HSV_BLUE} /*Yellow*/
                         // {0, 2, 240, 77, 75 }
 
 
 );
 
-const rgblight_segment_t PROGMEM layer_5[] = RGBLIGHT_LAYER_SEGMENTS(
+const rgblight_segment_t PROGMEM layer_sym[] = RGBLIGHT_LAYER_SEGMENTS(
         {0, 2, HSV_GREEN} /*Yellow*/
                     // {0, 2, 120, 85, 75 }
 
 
 );
 
-const rgblight_segment_t PROGMEM layer_6[] = RGBLIGHT_LAYER_SEGMENTS(
+const rgblight_segment_t PROGMEM layer_fun[] = RGBLIGHT_LAYER_SEGMENTS(
         {0, 2, HSV_RED} /*Yellow*/
                     // {0, 2, 0, 84, 75 }
 
 );
 
-const rgblight_segment_t PROGMEM layer_7[] = RGBLIGHT_LAYER_SEGMENTS(
+const rgblight_segment_t PROGMEM layer_white[] = RGBLIGHT_LAYER_SEGMENTS(
                 {0, 2, HSV_WHITE} /*Yellow*/
                             // {0, 2,0,0, 75 }
 
 
 );
 
-const rgblight_segment_t PROGMEM layer_8[] = RGBLIGHT_LAYER_SEGMENTS(
-    {0, 2, HSV_WHITE} /*Yellow*/
-                // {0, 2, 0,0, 75 }
-
-);
-
 const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
     capslock_layer,
-    layer_1,
-    layer_2,
-    layer_3,
-    layer_4,
-    layer_5,
-    layer_6,
-    layer_7,
-    layer_8
-    // layer0_colors,
-    // layer1_colors,
-    // layer2_colors,
-    // layer3_colors,
-    // layer4_colors,
-    // layer5_colors,
-    // layer6_colors,
-    // layer_7,
-    // layer_8
+    layer_white,
+    layer_white,
+    layer_nav,
+    layer_mouse,
+    layer_media,
+    layer_num,
+    layer_sym,
+    layer_fun
 );
 
 void keyboard_post_init_user(void) {
